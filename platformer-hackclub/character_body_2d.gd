@@ -22,6 +22,13 @@ func _physics_process(delta: float) -> void:
 
 	# 3. Beweging links/rechts
 	var direction := Input.get_axis("ui_left", "ui_right")
+	
+	# --- HIER PAS JE DE KIJKRICHTING AAN ---
+	# Vervang 'Sprite2D' door de exacte naam van de sprite van je sneeuwpop!
+	if direction > 0:
+		$Sprite2D.flip_h = false # Kijkt naar rechts
+	elif direction < 0:
+		$Sprite2D.flip_h = true  # Kijkt naar links
 	if direction:
 		velocity.x = direction * SPEED
 	else:
