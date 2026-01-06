@@ -17,18 +17,16 @@ func _physics_process(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	# 2. Springen
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")) and is_on_floor():
 		velocity.y = JUMP_VELOCITY
 
 	# 3. Beweging links/rechts
 	var direction := Input.get_axis("ui_left", "ui_right")
 	
-	# --- HIER PAS JE DE KIJKRICHTING AAN ---
-	# Vervang 'Sprite2D' door de exacte naam van de sprite van je sneeuwpop!
 	if direction > 0:
-		$Sprite2D.flip_h = false # Kijkt naar rechts
+		$Sprite2D.flip_h = true # Kijkt naar rechts
 	elif direction < 0:
-		$Sprite2D.flip_h = true  # Kijkt naar links
+		$Sprite2D.flip_h = false  # Kijkt naar links
 	if direction:
 		velocity.x = direction * SPEED
 	else:
@@ -55,11 +53,20 @@ func _physics_process(delta: float) -> void:
 					aangeraakte_tiles.append(tile_coord)
 					count += 1
 					update_ui()
-
+					
+					var layer = get_node("../TileMapLayer")
+					if layer:
+						
+						var snow_layer = get_node("../SnowLayer")
+						if snow_layer:
+							# We gebruiken tile_coord in plaats van (16, 18)
+							# Zo komt de sneeuw onder je voeten terecht!
+							var snow_atlas_pos = Vector2i(16, 7)
+							snow_layer.set_cell(tile_coord, 2, snow_atlas_pos)
 # Functie om de tekst op je scherm aan te passen
 func update_ui():
 	if label:
-		label.text = "Tiles aangeraakt: " + str(count)
+		label.text = "Tiles touched: " + str(count)
 	else:
 		# Dit verschijnt onderin in je 'Output' venster als het label niet gevonden wordt
 		print("Fout: Ik kan de Label node niet vinden!")
