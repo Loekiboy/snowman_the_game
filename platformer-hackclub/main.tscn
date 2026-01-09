@@ -1,9 +1,10 @@
-[gd_scene load_steps=13 format=4 uid="uid://tkp6t1bqmr0h"]
+[gd_scene load_steps=14 format=4 uid="uid://tkp6t1bqmr0h"]
 
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="1_1bvp3"]
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_h2yge"]
 [ext_resource type="Texture2D" uid="uid://bwu41mrjphwwt" path="res://kenney_pixel-platformer/Tilemap/tilemap-backgrounds_packed.png" id="4_1bvp3"]
 [ext_resource type="Texture2D" uid="uid://c3t7xjlvp67pr" path="res://kenney_pixel-platformer/Tilemap/tilemap.png" id="4_7mycd"]
+[ext_resource type="FontFile" uid="uid://bt8tctdmwdtfd" path="res://Silver.ttf" id="4_272bh"]
 [ext_resource type="Texture2D" uid="uid://bk3yydt0lhmil" path="res://kenney_pixel-platformer/Tilemap/backgrounds_blue.png" id="5_lquwl"]
 [ext_resource type="Texture2D" uid="uid://bstf5k577yo84" path="res://kenney_pixel-platformer/Tiles/tile_0111.png" id="6_7mycd"]
 
@@ -696,7 +697,7 @@ shape = SubResource("RectangleShape2D_ig7tw")
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
 position = Vector2(261, 315)
-zoom = Vector2(10, 10)
+zoom = Vector2(5, 5)
 position_smoothing_enabled = true
 
 [node name="SnowLayer" type="TileMapLayer" parent="."]
@@ -711,36 +712,45 @@ tile_set = SubResource("TileSet_4c57u")
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="WinPopup" type="Panel" parent="UI"]
+visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -230.0
-offset_top = -318.0
-offset_right = 234.0
-offset_bottom = -120.0
+offset_left = -351.0
+offset_top = -169.0
+offset_right = 351.0
+offset_bottom = 169.0
 grow_horizontal = 2
 grow_vertical = 2
 tooltip_text = "You win!"
 
 [node name="YouWon" type="TextEdit" parent="UI/WinPopup"]
 layout_mode = 0
-offset_left = 60.0
-offset_top = 6.0
-offset_right = 390.0
-offset_bottom = 114.0
+offset_left = 49.0
+offset_top = 24.0
+offset_right = 633.0
+offset_bottom = 194.0
 theme_override_colors/font_color = Color(0.21176471, 0.8901961, 0.46666667, 1)
-theme_override_font_sizes/font_size = 70
+theme_override_colors/font_outline_color = Color(0.20392157, 0.33333334, 0.31764707, 1)
+theme_override_constants/outline_size = 16
+theme_override_fonts/font = ExtResource("4_272bh")
+theme_override_font_sizes/font_size = 228
 text = "You won!"
+context_menu_enabled = false
 
 [node name="TextEdit" type="TextEdit" parent="UI/WinPopup"]
 layout_mode = 0
-offset_left = 84.0
-offset_top = 120.0
-offset_right = 368.0
-offset_bottom = 175.0
-theme_override_font_sizes/font_size = 30
+offset_left = 21.0
+offset_top = 207.0
+offset_right = 670.0
+offset_bottom = 308.0
+theme_override_colors/font_color = Color(0.17254902, 0.77254903, 0.9647059, 1)
+theme_override_colors/font_outline_color = Color(0.2627451, 0.2901961, 0.37254903, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("4_272bh")
+theme_override_font_sizes/font_size = 114
 text = "tiles touched:  123"
 
 [node name="TileCounterLabel" type="Label" parent="UI"]
@@ -753,7 +763,8 @@ size_flags_vertical = 0
 theme_override_colors/font_color = Color(0.8745098, 0.9647059, 0.9607843, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 11
-theme_override_font_sizes/font_size = 50
+theme_override_fonts/font = ExtResource("4_272bh")
+theme_override_font_sizes/font_size = 95
 text = "Tiles touched: 0"
 
 [node name="TileMapLayer2" type="TileMapLayer" parent="."]
