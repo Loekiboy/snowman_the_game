@@ -8,8 +8,20 @@ const JUMP_VELOCITY = -230.0
 var aangeraakte_tiles = []
 var count = 0
 
+
 # Zorg dat dit pad exact klopt met de naam van je Label!
 @onready var label = get_node("../UI/TileCounterLabel")
+@onready var popup = get_node("/root/Main/UI/WinPopup")
+@onready var teller_label = get_node("/root/Main/UI/TileCounterLabel")
+
+func _ready():
+	# Dit wordt één keer uitgevoerd als het spel start
+	if popup:
+		popup.visible = false
+	
+	# Zorg dat je teller aan het begin wel zichtbaar is
+	if teller_label:
+		teller_label.visible = true
 
 func _physics_process(delta: float) -> void:
 	# 1. Zwaartekracht toepassen
@@ -43,7 +55,7 @@ func _physics_process(delta: float) -> void:
 		
 		if collider is TileMapLayer:
 			# We kijken 4 pixels "in" de tegel om zeker te weten dat we hem raken
-			var botspunt = collider.to_local(collision.get_position() - collision.get_normal() * 4)
+			var botspunt = collider.to_local(collision.get_position() - collision.get_normal() * 1)
 			var tile_coord = collider.local_to_map(botspunt)
 			
 			# Check of de tegel niet leeg is
@@ -70,3 +82,18 @@ func update_ui():
 	else:
 		# Dit verschijnt onderin in je 'Output' venster als het label niet gevonden wordt
 		print("Fout: Ik kan de Label node niet vinden!")
+
+func _on_finish_flag_body_entered(body: Node2D) -> void:
+	# Check of het echt de speler is (CharacterBody2D) die de vlag raakt
+	if body.name == "CharacterBody2D":
+
+		if teller_label:
+			teller_label.visible = false
+			
+		if popup:
+			var win_label = popup.get_node("TextEdit") 
+			if win_label:
+				win_label.text = "Tiles touched: " + str(count)
+			
+			popup.visible = true
+			
