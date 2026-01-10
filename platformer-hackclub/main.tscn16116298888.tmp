@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=4 uid="uid://tkp6t1bqmr0h"]
+[gd_scene load_steps=23 format=4 uid="uid://tkp6t1bqmr0h"]
 
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="1_1bvp3"]
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_h2yge"]
@@ -12,10 +12,6 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(18, 16)
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_w48qg"]
-atlas = ExtResource("3_5vw27")
-region = Rect2(0, 36, 18, 18)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_5vw27"]
 atlas = ExtResource("3_5vw27")
 region = Rect2(0, 18, 18, 18)
@@ -27,10 +23,6 @@ region = Rect2(18, 18, 18, 18)
 [sub_resource type="AtlasTexture" id="AtlasTexture_vivmo"]
 atlas = ExtResource("3_5vw27")
 region = Rect2(54, 18, 18, 18)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2cqfq"]
-atlas = ExtResource("3_5vw27")
-region = Rect2(18, 36, 18, 18)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_kek77"]
 atlas = ExtResource("3_5vw27")
@@ -52,14 +44,6 @@ region = Rect2(54, 0, 18, 18)
 animations = [{
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_w48qg")
-}],
-"loop": true,
-"name": &"fall",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
 "texture": SubResource("AtlasTexture_5vw27")
 }, {
 "duration": 1.0,
@@ -71,14 +55,6 @@ animations = [{
 "loop": false,
 "name": &"idle",
 "speed": 3.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2cqfq")
-}],
-"loop": true,
-"name": &"jump",
-"speed": 5.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -785,7 +761,7 @@ position_smoothing_enabled = true
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D"]
 position = Vector2(261, 315)
 sprite_frames = SubResource("SpriteFrames_ycdy4")
-animation = &"fall"
+animation = &"idle"
 
 [node name="IdleTimer" type="Timer" parent="CharacterBody2D"]
 one_shot = true
