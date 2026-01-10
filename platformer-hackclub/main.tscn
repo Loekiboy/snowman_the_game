@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=4 uid="uid://tkp6t1bqmr0h"]
+[gd_scene load_steps=24 format=4 uid="uid://tkp6t1bqmr0h"]
 
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="1_1bvp3"]
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_h2yge"]
+[ext_resource type="Texture2D" uid="uid://dr6rif4gwj3w6" path="res://kenney_pixel-platformer/Tilemap/snowman.png" id="3_5vw27"]
 [ext_resource type="Texture2D" uid="uid://bwu41mrjphwwt" path="res://kenney_pixel-platformer/Tilemap/tilemap-backgrounds_packed.png" id="4_1bvp3"]
 [ext_resource type="Texture2D" uid="uid://c3t7xjlvp67pr" path="res://kenney_pixel-platformer/Tilemap/tilemap.png" id="4_7mycd"]
 [ext_resource type="FontFile" uid="uid://bt8tctdmwdtfd" path="res://Silver.ttf" id="4_272bh"]
@@ -10,6 +11,75 @@
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
 size = Vector2(18, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5vw27"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(0, 18, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ycdy4"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(18, 18, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w48qg"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(36, 18, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vivmo"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(54, 18, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kek77"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(0, 0, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4c57u"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(18, 0, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_efxa6"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(36, 0, 18, 18)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dg77c"]
+atlas = ExtResource("3_5vw27")
+region = Rect2(54, 0, 18, 18)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ycdy4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5vw27")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ycdy4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w48qg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vivmo")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kek77")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4c57u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_efxa6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dg77c")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 5.0
+}]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_kek77"]
 texture = ExtResource("4_7mycd")
@@ -295,6 +365,7 @@ texture_region_size = Vector2i(18, 18)
 12:3/0/terrains_peering_bit/top_side = 4
 13:3/0 = 0
 14:3/0 = 0
+14:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-9, -9, 9, -9, 9, 9, -9, 9)
 15:3/0 = 0
 16:3/0 = 0
 16:3/0/terrain_set = 0
@@ -679,6 +750,7 @@ z_index = 2
 script = ExtResource("1_h2yge")
 
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
+visible = false
 position = Vector2(261, 314.00003)
 scale = Vector2(1, 0.9999991)
 texture = ExtResource("1_1bvp3")
@@ -692,6 +764,14 @@ shape = SubResource("RectangleShape2D_ig7tw")
 position = Vector2(261, 315)
 zoom = Vector2(5, 5)
 position_smoothing_enabled = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D"]
+position = Vector2(261, 315)
+sprite_frames = SubResource("SpriteFrames_ycdy4")
+animation = &"idle"
+
+[node name="IdleTimer" type="Timer" parent="CharacterBody2D"]
+one_shot = true
 
 [node name="SnowLayer" type="TileMapLayer" parent="."]
 position = Vector2(0, -2)
@@ -747,10 +827,10 @@ theme_override_font_sizes/font_size = 114
 text = "tiles touched:  123"
 
 [node name="TileCounterLabel" type="Label" parent="UI"]
-offset_left = 3.0
-offset_top = 5.0
-offset_right = 379.0
-offset_bottom = 74.0
+offset_left = 155.0
+offset_top = -82.0
+offset_right = 595.0
+offset_bottom = 23.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_colors/font_color = Color(0.8745098, 0.9647059, 0.9607843, 1)
@@ -785,4 +865,5 @@ texture = ExtResource("6_7mycd")
 position = Vector2(479, 313)
 shape = SubResource("RectangleShape2D_272bh")
 
+[connection signal="timeout" from="CharacterBody2D/IdleTimer" to="CharacterBody2D" method="_on_idle_timer_timeout"]
 [connection signal="body_entered" from="FinishFlag" to="CharacterBody2D" method="_on_finish_flag_body_entered"]
