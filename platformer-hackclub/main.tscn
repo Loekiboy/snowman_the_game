@@ -8,8 +8,9 @@
 [ext_resource type="FontFile" uid="uid://bt8tctdmwdtfd" path="res://Silver.ttf" id="4_272bh"]
 [ext_resource type="Texture2D" uid="uid://bk3yydt0lhmil" path="res://kenney_pixel-platformer/Tilemap/backgrounds_blue.png" id="5_lquwl"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
-size = Vector2(16, 14.999992)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_272bh"]
+radius = 8.0
+height = 17.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_yaehf"]
 atlas = ExtResource("3_5vw27")
@@ -809,7 +810,7 @@ flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
 position = Vector2(261, 315.5)
-shape = SubResource("RectangleShape2D_ig7tw")
+shape = SubResource("CapsuleShape2D_272bh")
 
 [node name="Camera2D" type="Camera2D" parent="CharacterBody2D"]
 position = Vector2(261, 315)
@@ -819,7 +820,7 @@ position_smoothing_enabled = true
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="CharacterBody2D"]
 position = Vector2(261, 315)
 sprite_frames = SubResource("SpriteFrames_ycdy4")
-animation = &"crouch"
+animation = &"walk"
 
 [node name="IdleTimer" type="Timer" parent="CharacterBody2D"]
 one_shot = true
@@ -916,13 +917,13 @@ texture = ExtResource("5_lquwl")
 [node name="FinishFlag" type="Area2D" parent="."]
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="FinishFlag"]
-position = Vector2(459, 298)
+position = Vector2(468, 241)
 sprite_frames = SubResource("SpriteFrames_82xsv")
 autoplay = "default"
-frame_progress = 0.16069297
+frame_progress = 0.5187803
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FinishFlag"]
-position = Vector2(459, 298)
+position = Vector2(468, 241)
 shape = SubResource("RectangleShape2D_272bh")
 
 [connection signal="timeout" from="CharacterBody2D/IdleTimer" to="CharacterBody2D" method="_on_idle_timer_timeout"]

@@ -3,7 +3,7 @@ extends CharacterBody2D
 # --- JOUW INSTELLINGEN ---
 const SPEED = 70.0
 const JUMP_VELOCITY = -230.0
-const COYOTE_TIME = 0.08
+const COYOTE_TIME = 0.13
 
 # --- VARIABELEN ---
 var aangeraakte_tiles = []
