@@ -3,15 +3,18 @@ extends CharacterBody2D
 # --- JOUW INSTELLINGEN ---
 const SPEED = 70.0
 const JUMP_VELOCITY = -230.0
+const COYOTE_TIME = 0.08
 
 # --- VARIABELEN ---
 var aangeraakte_tiles = []
 var count = 0
+var coyote_timer = 0.0  
 
 # onready vars
 @onready var label = get_node("../UI/TileCounterLabel")
 @onready var popup = get_node("/root/Main/UI/WinPopup")
 @onready var teller_label = get_node("/root/Main/UI/TileCounterLabel")
+@onready var restart_button = get_node("/root/Main/UI/WinPopup/Button")
 @onready var _animated_sprite = $AnimatedSprite2D
 @onready var idle_timer = $IdleTimer
 
@@ -19,19 +22,38 @@ func _ready():
 	if popup: popup.visible = false
 	if teller_label: teller_label.visible = true
 	
+	if restart_button:
+		# Dit koppelt de klik-actie aan de functie hieronder
+		restart_button.pressed.connect(_on_restart_button_pressed)
+	
 	# Start direct met wachten als het spel begint
 	_animated_sprite.play("idle")
 	_animated_sprite.frame = 0
 	idle_timer.start(3.0)
 
 func _physics_process(delta: float) -> void:
-	# 1. Zwaartekracht
+#	 1. Zwaartekracht
 	if not is_on_floor():
 		velocity += get_gravity() * delta
+	else:
+		# Reset coyote timer als we op de grond staan
+		coyote_timer = COYOTE_TIME
+
+	# Verminder coyote timer als we in de lucht zijn
+	if not is_on_floor():
+		coyote_timer -= delta
+		if coyote_timer < 0:
+			coyote_timer = 0  # Zorg dat het niet negatief wordt
 
 	# 2. Springen
-	if (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")) and is_on_floor():
+	if (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")) and coyote_timer > 0:
 		velocity.y = JUMP_VELOCITY
+		coyote_timer = 0  # Reset zodat je niet dubbel springt
+		
+		# De velocity word gehalveerd als je de up knop loslaat voordat hij weer daalt.
+	if (Input.is_action_just_released("ui_up") or Input.is_action_just_released("ui_accept")and velocity.y <= 0):
+		velocity.y = velocity.y * 0.5
+
 
 	# 3. Beweging links/rechts
 	var direction := Input.get_axis("ui_left", "ui_right")
@@ -42,13 +64,13 @@ func _physics_process(delta: float) -> void:
 	
 	# 4. ANIMATIE LOGICA
 	if not is_on_floor():
-		idle_timer.stop() # Geen idle timer tijdens springen/vallen
-		
+		idle_timer.stop() 
 		if velocity.y < 0:
 			_animated_sprite.play("jump")
 		else:
 			_animated_sprite.play("fall")
 	else:
+		# We staan op de grond
 		if velocity.x != 0:
 			_animated_sprite.play("walk")
 			idle_timer.stop()
@@ -56,17 +78,22 @@ func _physics_process(delta: float) -> void:
 				_animated_sprite.flip_h = false
 			else:
 				_animated_sprite.flip_h = true
+		
+		# We staan stil op de grond: Check voor bukken
+		elif Input.is_action_pressed("ui_down"):
+			_animated_sprite.play("crouch")
+			idle_timer.stop() # Stop de timer zodat hij niet gaat 'rondkijken' terwijl je bukt
+		
 		else:
-	# Alleen als we NET gestopt zijn met lopen
-			if _animated_sprite.animation == "walk":
+			# We staan stil en we bukken niet: Idle logica
+			
+			# Reset naar idle als we net ergens anders vandaan komen (lopen, vallen of bukken)
+			if _animated_sprite.animation == "walk" or \
+			   _animated_sprite.animation == "fall" or \
+			   _animated_sprite.animation == "crouch":
 				_animated_sprite.play("idle")
-				_animated_sprite. frame = 0
+				_animated_sprite.frame = 0
 				idle_timer.start(3.0)
-			if _animated_sprite.animation == "fall":
-				_animated_sprite.play("idle")
-				_animated_sprite. frame = 0
-				idle_timer.start(3.0)
-	# Als we al in idle zijn, doe NIETS - laat de timer zijn werk doen
 
 	# 5. Bewegen
 	move_and_slide()
@@ -121,3 +148,7 @@ func _on_finish_flag_body_entered(body: Node2D) -> void:
 			var win_label = popup.get_node("TextEdit")
 			if win_label: win_label.text = "Tiles touched: " + str(count)
 			popup.visible = true
+			
+func _on_restart_button_pressed():
+	# Dit is het commando om de huidige scene opnieuw te laden
+	get_tree().reload_current_scene()
