@@ -144,55 +144,21 @@ func _physics_process(delta:  float) -> void:
 	# 6. Bewegen
 	move_and_slide()
 
-# 7. Tile detectie - ALLEEN ONDER DE SPELER
-	print("=== TILE DETECTIE ===")
-	print("is_on_floor:  ", is_on_floor())
-
-	if is_on_floor():
-		print("✓ We staan op de grond")
-	
-		print("Parent gevonden: ", parent != null)
-	
-		if parent:
-			print("Parent naam: ", parent.name)
-			print("Aantal children: ", parent.get_children().size())
-		
-			for child in parent.get_children():
-				print("  - Child: ", child.name, " (is TileMapLayer: ", child is TileMapLayer, ")")
-			
-				if child is TileMapLayer and child.name != "SnowLayer": 
-					print("    ✓ Dit is een TileMapLayer (niet SnowLayer)")
-				
-					var onder_speler = global_position + Vector2(0, 10)
-					print("    Speler positie: ", global_position)
-					print("    Check positie (onder): ", onder_speler)
-				
-					var tile_coord = child.local_to_map(onder_speler)
-					print("    Tile coordinaat: ", tile_coord)
-					
-					var source_id = child.get_cell_source_id(tile_coord)
-					print("    Source ID: ", source_id)
-				
-					if source_id != -1:
-						print("    ✓ Er is een tile op deze positie!")
-					
-						if not tile_coord in aangeraakte_tiles:
-							print("    ✓ Tile nog niet aangeraakt, sneeuw plaatsen...")
-							aangeraakte_tiles.append(tile_coord)
-							count += 1
-							update_ui()
-							var snow_layer = get_node("../SnowLayer")
-							print("    Snow layer gevonden: ", snow_layer != null)
-							if snow_layer:  
-								snow_layer. set_cell(tile_coord, 2, Vector2i(16, 7))
-								print("❄️ Sneeuw geplaatst op tile: ", tile_coord)
-							break
-						else:
-							print("    ✗ Tile al eerder aangeraakt")
-					else:
-						print("    ✗ Geen tile op deze positie (source_id = -1)")
-	else:
-		print("✗ We staan NIET op de grond")
+	# 7. Tile detectie
+	for i in get_slide_collision_count():
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+		if collider is TileMapLayer:
+			var botspunt = collider.to_local(collision.get_position() - collision.get_normal() * 1)
+			var tile_coord = collider.local_to_map(botspunt)
+			if collider.get_cell_source_id(tile_coord) != -1:
+				if not tile_coord in aangeraakte_tiles:
+					aangeraakte_tiles.append(tile_coord)
+					count += 1
+					update_ui()
+					var snow_layer = get_node("../SnowLayer")
+					if snow_layer: 
+						snow_layer.set_cell(tile_coord, 2, Vector2i(16, 7))
 
 func _on_idle_timer_timeout() -> void:
 	if velocity.x != 0:
