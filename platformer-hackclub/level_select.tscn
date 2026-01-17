@@ -1,0 +1,20 @@
+[gd_scene load_steps=2 format=3 uid="uid://diyimn4te01t0"]
+
+[ext_resource type="FontFile" uid="uid://bt8tctdmwdtfd" path="res://Silver.ttf" id="1_il3u1"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+offset_left = 406.0
+offset_top = 244.0
+offset_right = 723.0
+offset_bottom = 414.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_il3u1")
+theme_override_font_sizes/font_size = 76
+text = "YO Next level"
+
+[node name="Camera2D" type="Camera2D" parent="."]
