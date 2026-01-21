@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=4 uid="uid://tkp6t1bqmr0h"]
+[gd_scene load_steps=30 format=4 uid="uid://tkp6t1bqmr0h"]
 
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="1_1bvp3"]
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_h2yge"]
@@ -8,6 +8,7 @@
 [ext_resource type="FontFile" uid="uid://bt8tctdmwdtfd" path="res://Silver.ttf" id="4_272bh"]
 [ext_resource type="Texture2D" uid="uid://bk3yydt0lhmil" path="res://kenney_pixel-platformer/Tilemap/backgrounds_blue.png" id="5_lquwl"]
 [ext_resource type="Texture2D" uid="uid://dtalbc8eg46wn" path="res://kenney_pixel-platformer/retry.png" id="6_5vw27"]
+[ext_resource type="Texture2D" uid="uid://01kf421sdi0w" path="res://kenney_pixel-platformer/next.png" id="7_kek77"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_272bh"]
 radius = 8.0
@@ -1001,9 +1002,10 @@ expand_icon = true
 layout_mode = 0
 offset_left = 406.0
 offset_top = 325.0
-offset_right = 481.0
-offset_bottom = 382.0
-text = "next level"
+offset_right = 466.0
+offset_bottom = 385.0
+icon = ExtResource("7_kek77")
+expand_icon = true
 
 [node name="TileCounterLabel" type="Label" parent="UI"]
 offset_right = 440.0

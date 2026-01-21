@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=4 uid="uid://cjilns0sf5i26"]
+[gd_scene load_steps=38 format=4 uid="uid://cjilns0sf5i26"]
 
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_1mhn8"]
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="2_0rof8"]
@@ -8,6 +8,8 @@
 [ext_resource type="FontFile" uid="uid://bt8tctdmwdtfd" path="res://Silver.ttf" id="5_hi5em"]
 [ext_resource type="Texture2D" uid="uid://bwu41mrjphwwt" path="res://kenney_pixel-platformer/Tilemap/tilemap-backgrounds_packed.png" id="6_bbj40"]
 [ext_resource type="Texture2D" uid="uid://bk3yydt0lhmil" path="res://kenney_pixel-platformer/Tilemap/backgrounds_blue.png" id="7_4fcfw"]
+[ext_resource type="Texture2D" uid="uid://dtalbc8eg46wn" path="res://kenney_pixel-platformer/retry.png" id="7_l8hla"]
+[ext_resource type="Texture2D" uid="uid://01kf421sdi0w" path="res://kenney_pixel-platformer/next.png" id="8_hi5em"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_272bh"]
 radius = 8.0
@@ -1421,11 +1423,21 @@ process_mode = 3
 layout_mode = 0
 offset_left = 304.0
 offset_top = 326.0
-offset_right = 396.0
+offset_right = 353.0
 offset_bottom = 376.0
 theme_override_fonts/font = ExtResource("5_hi5em")
 theme_override_font_sizes/font_size = 38
-text = "restart"
+icon = ExtResource("7_l8hla")
+expand_icon = true
+
+[node name="NextLevelButton" type="Button" parent="UI/WinPopup"]
+layout_mode = 0
+offset_left = 367.0
+offset_top = 325.0
+offset_right = 417.0
+offset_bottom = 374.0
+icon = ExtResource("8_hi5em")
+expand_icon = true
 
 [node name="TileCounterLabel" type="Label" parent="UI"]
 offset_right = 440.0
