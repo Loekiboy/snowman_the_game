@@ -23,6 +23,7 @@ var first_idle = true  # Track of dit de eerste idle is
 @onready var popup = get_node("/root/Main/UI/WinPopup")
 @onready var teller_label = get_node("/root/Main/UI/TileCounterLabel")
 @onready var restart_button = get_node("/root/Main/UI/WinPopup/Button")
+@onready var next_level_button = get_node("/root/Main/UI/WinPopup/NextLevelButton")
 @onready var tilemap_layer = get_node("../TileMapLayer2")
 @onready var _animated_sprite = $AnimatedSprite2D
 @onready var idle_timer = $IdleTimer
@@ -33,6 +34,9 @@ func _ready():
 	
 	if restart_button:
 		restart_button.pressed.connect(_on_restart_button_pressed)
+		
+	if next_level_button:
+		next_level_button.pressed.connect(_on_next_level_button_pressed)
 	
 	_animated_sprite.play("idle")
 	_animated_sprite.frame = 0
@@ -40,11 +44,9 @@ func _ready():
 	
 	RenderingServer.set_default_clear_color(Color("#c2e3e8"))
 
-func _physics_process(delta:   float) -> void:
-	
-	# Check of we op een ladder staan
+func _physics_process(delta: float) -> void:
+	# 1. Ladder check
 	is_on_ladder = false
-	
 	var parent = get_parent()
 	if parent: 
 		for child in parent.get_children():
@@ -54,33 +56,28 @@ func _physics_process(delta:   float) -> void:
 					global_position + Vector2(0, 8),
 					global_position + Vector2(0, -8),
 				]
-			
 				for check_pos in check_positions:
 					var tile_pos = child.local_to_map(check_pos)
 					var tile_data = child.get_cell_tile_data(tile_pos)
-				
-					if tile_data: 
-						var is_climbable = tile_data.get_custom_data("is_climbable")
-						if is_climbable:
-							is_on_ladder = true
-							break
-			
+					if tile_data and tile_data.get_custom_data("is_climbable"):
+						is_on_ladder = true
+						break
 				if is_on_ladder:  
 					break
 
-	# 1. Zwaartekracht & Coyote Reset
+	# 2. Zwaartekracht & Coyote Reset
 	if is_on_floor():
 		coyote_timer = COYOTE_TIME
 		just_jumped = false
 	
-	if not is_on_floor():
-		if is_on_ladder and not just_jumped:
-			velocity.y = 0
-		else:  
+	if is_on_ladder and not just_jumped:
+		velocity.y = 0
+	else:  
+		if not is_on_floor():
 			velocity += get_gravity() * delta
 			coyote_timer -= delta
 
-	# 2. SPRINGEN
+	# 3. SPRINGEN
 	if (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")) and (coyote_timer > 0 or is_on_ladder):
 		velocity.y = JUMP_VELOCITY
 		coyote_timer = 0
@@ -89,7 +86,7 @@ func _physics_process(delta:   float) -> void:
 	if (Input.is_action_just_released("ui_up") or Input.is_action_just_released("ui_accept")) and velocity.y < 0:
 		velocity.y = velocity.y * 0.5
 
-	# 3. KLIMMEN
+	# 4. KLIMMEN
 	if is_on_ladder and not just_jumped:
 		if Input.is_action_pressed("ui_up"):
 			velocity.y = CLIMB_SPEED
@@ -101,16 +98,16 @@ func _physics_process(delta:   float) -> void:
 	if just_jumped and velocity.y > 0:
 		just_jumped = false
 
-	# 4. Beweging links/rechts
+	# 5. Beweging links/rechts
 	var direction := Input.get_axis("ui_left", "ui_right")
 	if direction:
 		velocity.x = direction * SPEED
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 	
-	# 5. ANIMATIE LOGICA
+	# 6. ANIMATIE LOGICA
 	if not is_on_floor():
-		idle_timer. stop()
+		idle_timer.stop()
 		idle_in_transition = false
 		first_idle = true
 		if velocity.y < 0:
@@ -126,10 +123,10 @@ func _physics_process(delta:   float) -> void:
 			if velocity.x < 0:
 				_animated_sprite.flip_h = false
 			else:  
-				_animated_sprite. flip_h = true
+				_animated_sprite.flip_h = true
 		
 		elif Input.is_action_pressed("ui_down"):
-			_animated_sprite. play("crouch")
+			_animated_sprite.play("crouch")
 			idle_timer.stop()
 			idle_in_transition = false
 			first_idle = true
@@ -146,10 +143,10 @@ func _physics_process(delta:   float) -> void:
 				# Idle is al aan het lopen, doe niets
 				pass
 
-	# 6. Bewegen
+	# 7. Bewegen
 	move_and_slide()
 
-	# 7. Tile detectie
+	# 8. Tile detectie
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
@@ -163,12 +160,12 @@ func _physics_process(delta:   float) -> void:
 				
 				if collider.get_cell_source_id(tile_coord) != -1:
 					if not tile_coord in aangeraakte_tiles: 
-						aangeraakte_tiles. append(tile_coord)
+						aangeraakte_tiles.append(tile_coord)
 						count += 1
 						update_ui()
 						var snow_layer = get_node("../SnowLayer")
 						if snow_layer: 
-							snow_layer. set_cell(tile_coord, 2, Vector2i(16, 7))
+							snow_layer.set_cell(tile_coord, 2, Vector2i(16, 7))
 
 func _on_idle_timer_timeout() -> void:
 	# Stop als speler beweegt
@@ -190,7 +187,7 @@ func _on_idle_timer_timeout() -> void:
 	if first_idle: 
 		first_idle = false
 		var keuzes = [1, 2]  # Links of rechts
-		_animated_sprite.frame = keuzes. pick_random()
+		_animated_sprite.frame = keuzes.pick_random()
 		idle_timer.start(randf_range(1.0, 3.0))
 		return
 	
@@ -230,3 +227,12 @@ func _on_finish_flag_body_entered(body: Node2D) -> void:
 			
 func _on_restart_button_pressed():
 	get_tree().reload_current_scene()
+	
+func _on_next_level_button_pressed():
+	# Vervang "Level2.tscn" door de echte naam van je tweede level bestand
+	var next_level = "res://main2.tscn"
+	
+	if FileAccess.file_exists(next_level):
+		get_tree().change_scene_to_file(next_level)
+	else:
+		print("Fout: Level 2 niet gevonden!")

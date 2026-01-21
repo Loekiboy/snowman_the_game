@@ -945,7 +945,6 @@ tile_set = SubResource("TileSet_4c57u")
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="WinPopup" type="Panel" parent="UI"]
-visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -997,6 +996,14 @@ theme_override_font_sizes/font_size = 38
 theme_override_icons/icon = ExtResource("6_5vw27")
 icon = ExtResource("6_5vw27")
 expand_icon = true
+
+[node name="NextLevelButton" type="Button" parent="UI/WinPopup"]
+layout_mode = 0
+offset_left = 406.0
+offset_top = 325.0
+offset_right = 481.0
+offset_bottom = 382.0
+text = "next level"
 
 [node name="TileCounterLabel" type="Label" parent="UI"]
 offset_right = 440.0
