@@ -926,6 +926,8 @@ animation = &"idle"
 [node name="IdleTimer" type="Timer" parent="CharacterBody2D"]
 one_shot = true
 
+[node name="SnowStepPlayer" type="AudioStreamPlayer2D" parent="CharacterBody2D"]
+
 [node name="SnowLayer" type="TileMapLayer" parent="."]
 z_index = 3
 tile_set = SubResource("TileSet_4c57u")

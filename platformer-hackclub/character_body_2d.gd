@@ -27,6 +27,17 @@ var first_idle = true  # Track of dit de eerste idle is
 @onready var tilemap_layer = get_node("../TileMapLayer2")
 @onready var _animated_sprite = $AnimatedSprite2D
 @onready var idle_timer = $IdleTimer
+@onready var snow_step_player = $SnowStepPlayer
+
+# SFX lijst
+var snow_step_sfx := [
+	preload("res://sounds/snow step/1.wav"),
+	preload("res://sounds/snow step/2.wav"),
+	preload("res://sounds/snow step/3.wav"),
+	preload("res://sounds/snow step/4.wav"),
+	preload("res://sounds/snow step/5.wav"),
+	preload("res://sounds/snow step/6.wav"),
+]
 
 func _ready():
 	if popup:  popup.visible = false
@@ -43,6 +54,7 @@ func _ready():
 	# NIET hier starten, wachten tot speler stilstaat
 	
 	RenderingServer.set_default_clear_color(Color("#c2e3e8"))
+	randomize()
 
 func _physics_process(delta: float) -> void:
 	# 1. Ladder check
@@ -166,6 +178,11 @@ func _physics_process(delta: float) -> void:
 						var snow_layer = get_node("../SnowLayer")
 						if snow_layer: 
 							snow_layer.set_cell(tile_coord, 2, Vector2i(16, 7))
+
+							# plays rondom snow effect
+							if snow_step_player and snow_step_sfx.size() > 0:
+								snow_step_player.stream = snow_step_sfx[randi_range(0, snow_step_sfx.size() - 1)]
+								snow_step_player.play()
 
 func _on_idle_timer_timeout() -> void:
 	# Stop als speler beweegt
