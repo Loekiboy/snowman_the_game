@@ -61,12 +61,17 @@ func _physics_process(delta: float) -> void:
 	is_on_ladder = false
 	var parent = get_parent()
 	if parent: 
+		# Pas deze aan als je tilesize anders is dan 16x16
+		var tile_size = 18
+		# De offset die je noemde: 19 tiles naar rechts (+), 13 naar beneden (+)
+		var ladder_offset = Vector2(14.5 * tile_size, 17.3 * tile_size)
+
 		for child in parent.get_children():
 			if child is TileMapLayer: 
 				var check_positions = [
-					global_position,
-					global_position + Vector2(0, 8),
-					global_position + Vector2(0, -8),
+					global_position + ladder_offset,
+					global_position + ladder_offset + Vector2(0, 8),
+					global_position + ladder_offset + Vector2(0, -8),
 				]
 				for check_pos in check_positions:
 					var tile_pos = child.local_to_map(check_pos)
@@ -74,7 +79,7 @@ func _physics_process(delta: float) -> void:
 					if tile_data and tile_data.get_custom_data("is_climbable"):
 						is_on_ladder = true
 						break
-				if is_on_ladder:  
+				if is_on_ladder:   
 					break
 
 	# 2. Zwaartekracht & Coyote Reset
@@ -90,13 +95,12 @@ func _physics_process(delta: float) -> void:
 			coyote_timer -= delta
 
 	# 3. SPRINGEN
-	if (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")) and (coyote_timer > 0 or is_on_ladder):
+	if (Input.is_action_just_pressed("ui_up") or Input.is_action_just_pressed("ui_accept")) \
+		and coyote_timer > 0 \
+		and not is_on_ladder:
 		velocity.y = JUMP_VELOCITY
 		coyote_timer = 0
 		just_jumped = true
-		
-	if (Input.is_action_just_released("ui_up") or Input.is_action_just_released("ui_accept")) and velocity.y < 0:
-		velocity.y = velocity.y * 0.5
 
 	# 4. KLIMMEN
 	if is_on_ladder and not just_jumped:
@@ -117,8 +121,20 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 	
-	# 6. ANIMATIE LOGICA
-	if not is_on_floor():
+# 6. ANIMATIE LOGICA
+	if is_on_ladder and not is_on_floor():
+		_animated_sprite.play("climb")
+		# Pauzeer de animatie als de speler niet omhoog of omlaag beweegt
+		if velocity.y == 0:
+			_animated_sprite.stop() 
+		else:
+			_animated_sprite.play()
+			
+		idle_timer.stop()
+		idle_in_transition = false
+		first_idle = true
+
+	elif not is_on_floor():
 		idle_timer.stop()
 		idle_in_transition = false
 		first_idle = true
@@ -127,6 +143,7 @@ func _physics_process(delta: float) -> void:
 		else:
 			_animated_sprite.play("fall")
 	else:
+		
 		if velocity.x != 0:
 			_animated_sprite.play("walk")
 			idle_timer.stop()
