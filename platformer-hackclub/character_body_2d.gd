@@ -12,6 +12,8 @@ var count = 0
 var coyote_timer = 0.0  
 var is_on_ladder = false
 var just_jumped = false 
+var time_elapsed = 0.0
+var level_active = true
 
 # Idle animatie variabelen
 var idle_target_frame = 0
@@ -20,6 +22,7 @@ var first_idle = true  # Track of dit de eerste idle is
 
 # onready vars
 @onready var label = get_node("../UI/TileCounterLabel")
+@onready var stopwatch_label = get_node("/root/Main/UI/StopwatchLabel")
 @onready var popup = get_node("/root/Main/UI/WinPopup")
 @onready var teller_label = get_node("/root/Main/UI/TileCounterLabel")
 @onready var restart_button = get_node("/root/Main/UI/WinPopup/Button")
@@ -57,6 +60,10 @@ func _ready():
 	randomize()
 
 func _physics_process(delta: float) -> void:
+	
+	if level_active:
+		time_elapsed += delta
+		_update_stopwatch_ui()
 	# 1. Ladder check
 	is_on_ladder = false
 	var parent = get_parent()
@@ -64,7 +71,7 @@ func _physics_process(delta: float) -> void:
 		# Pas deze aan als je tilesize anders is dan 16x16
 		var tile_size = 18
 		# De offset die je noemde: 19 tiles naar rechts (+), 13 naar beneden (+)
-		var ladder_offset = Vector2(14.5 * tile_size, 17.3 * tile_size)
+		var ladder_offset = Vector2(14.5 * tile_size, 17.4 * tile_size)
 
 		for child in parent.get_children():
 			if child is TileMapLayer: 
@@ -253,20 +260,46 @@ func update_ui():
 
 func _on_finish_flag_body_entered(body: Node2D) -> void:
 	if body.name == "CharacterBody2D":
+		level_active = false # Stop de timer
+		
 		if teller_label: teller_label.visible = false
+		if stopwatch_label: stopwatch_label.visible = false
+		
 		if popup: 
 			var win_label = popup.get_node("TextEdit")
-			if win_label: win_label.text = "Tiles touched: " + str(count)
+			if win_label:
+				# 1. Bereken de multiplier en de eindscore als getallen
+				var multiplier = time_elapsed / 10.0
+				var totaal_score = count * multiplier
+				
+				# 2. Rond de getallen af voor een mooie weergave
+				var afgeronde_mult = snapped(multiplier, 0.1)
+				var afgeronde_score = snapped(totaal_score, 1) # Score afronden op heel getal
+				
+				# 3. Zet alles pas in de tekst (we gebruiken str() alleen om het te laten zien)
+				win_label.text = "Tiles: " + str(count) + " x " + str(afgeronde_mult) + \
+								 "\nScore: " + str(afgeronde_score)
+				
+				
 			popup.visible = true
 			
 func _on_restart_button_pressed():
 	get_tree().reload_current_scene()
 	
 func _on_next_level_button_pressed():
-	# Vervang "Level2.tscn" door de echte naam van je tweede level bestand
 	var next_level = "res://main2.tscn"
 	
 	if FileAccess.file_exists(next_level):
 		get_tree().change_scene_to_file(next_level)
 	else:
 		print("Fout: Level 2 niet gevonden!")
+	
+func _update_stopwatch_ui():
+	if stopwatch_label:
+		var multiplier = time_elapsed / 10.0
+		
+		# We maken een mooie tekstregel: "TIJD | MULTIPLIER"
+		# De snapped(multiplier, 0.1) zorgt voor 1 cijfer achter de komma
+		var multiplier_tekst = "x" + str(snapped(multiplier, 0.1))
+		
+		stopwatch_label.text = multiplier_tekst
