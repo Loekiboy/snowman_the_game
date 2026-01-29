@@ -1553,7 +1553,6 @@ tile_map_data = PackedByteArray("AAAdAO3/AgAKAAMAAAAhAOj/AgAKAAMAAFASAPT/AgAKAAM
 tile_set = SubResource("TileSet_4c57u")
 
 [node name="UI" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="WinPopup" type="Panel" parent="UI"]
 anchors_preset = 8

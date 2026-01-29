@@ -5,7 +5,7 @@ const SPEED = 70.0
 const JUMP_VELOCITY = -230.0
 const COYOTE_TIME = 0.16
 const CLIMB_SPEED = -70
-const FOOTPRINT_DISTANCE = 8.0 # Hoeveel pixels lopen voor nieuwe sneeuw
+const FOOTPRINT_DISTANCE = 16.0 # Hoeveel pixels lopen voor nieuwe sneeuw
 
 # --- VARIABELEN ---
 var aangeraakte_tiles = []
@@ -28,7 +28,7 @@ var first_idle = true
 @onready var popup = get_node("/root/Main/UI/WinPopup")
 @onready var teller_label = get_node("/root/Main/UI/TileCounterLabel")
 @onready var tilemap_layer = get_node("../TileMapLayer2")
-@onready var snow_layer = get_node("../SnowLayer") # Je TileMapLayer voor de textures
+@onready var snow_layer = get_node("../SnowLayer")
 @onready var _animated_sprite = $AnimatedSprite2D
 @onready var idle_timer = $IdleTimer
 @onready var snow_step_player = $SnowStepPlayer
@@ -55,7 +55,7 @@ func _physics_process(delta: float) -> void:
 		time_elapsed += delta
 		_update_stopwatch_ui()
 
-	# 1. Ladder check (vereenvoudigd voor leesbaarheid)
+	# 1. Ladder check
 	_check_ladder()
 
 	# 2. Zwaartekracht
@@ -100,7 +100,6 @@ func _handle_snow_generation():
 
 func _spawn_hybrid_snow(pos: Vector2, original_tilemap: TileMapLayer):
 	# 1. BEREKEN DE X OP HET GRID
-	# We pakken de X van de tilemap en snappen de wereld-X daarop
 	var local_pos = original_tilemap.to_local(pos)
 	var map_coord = original_tilemap.local_to_map(local_pos)
 	var snapped_x = original_tilemap.to_global(original_tilemap.map_to_local(map_coord)).x
@@ -113,15 +112,25 @@ func _spawn_hybrid_snow(pos: Vector2, original_tilemap: TileMapLayer):
 	var source = tileset.get_source(2) as TileSetAtlasSource # Jouw source ID 2
 	
 	snow_sprite.texture = source.texture
-	# We pakken precies het vierkantje van de sneeuw-tile (Vector2i(16, 7))
-	var region_size = tileset.tile_size
+	
+	# FIX: tilesize is 18x18 en spacing is 1px
+	var region_size = tileset.tile_size             # Vector2i(18, 18)
+	var spacing = 1
+	var atlas_coords = Vector2i(16, 7)             # jouw tile in de atlas
+	
+	var region_x = atlas_coords.x * (region_size.x + spacing)
+	var region_y = atlas_coords.y * (region_size.y + spacing)
+	
 	snow_sprite.region_enabled = true
-	snow_sprite.region_rect = Rect2(Vector2(16 * region_size.x, 7 * region_size.y), region_size)
+	snow_sprite.region_rect = Rect2(
+		Vector2(region_x, region_y),
+		Vector2(region_size)
+	)
 	
 	# 3. POSITIONERING
 	# X is snapped naar het grid, Y is precies waar de collision was
-	snow_sprite.global_position = Vector2(snapped_x, pos.y)
-	snow_sprite.z_index = -1 # Achter de speler
+	snow_sprite.global_position = Vector2(snapped_x, pos.y + 9)
+	snow_sprite.z_index = 0
 	
 	get_parent().add_child(snow_sprite)
 	
@@ -138,14 +147,12 @@ func _update_score(tile_coord: Vector2i):
 		count += 1
 		update_ui()
 
-# --- HULPFUNCTIES (De rest van je code) ---
-
 func _check_ladder():
 	is_on_ladder = false
 	var parent = get_parent()
 	if parent: 
 		var tile_size = 18
-		var ladder_offset = Vector2(14.5 * tile_size, 17.4 * tile_size)
+		var ladder_offset = Vector2(14.5 * tile_size, 17.8 * tile_size)
 		for child in parent.get_children():
 			if child is TileMapLayer: 
 				var check_pos = global_position + ladder_offset
