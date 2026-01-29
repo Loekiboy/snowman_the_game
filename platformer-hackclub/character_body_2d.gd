@@ -59,9 +59,6 @@ func _ready():
 	_animated_sprite.frame = 0
 	# NIET hier starten, wachten tot speler stilstaat
 
-	RenderingServer.set_default_clear_color(Color("#c2e3e8"))
-	randomize()
-
 func _physics_process(delta: float) -> void:
 	if level_active:
 		time_elapsed += delta
@@ -177,6 +174,12 @@ func _physics_process(delta: float) -> void:
 
 	# 7. Bewegen
 	move_and_slide()
+	
+	# Achtergrondkleur aanpassen op basis van hoogte (Y-positie)
+	if global_position.y < 0:
+		RenderingServer.set_default_clear_color(Color("#DFF6F5"))
+	else:
+		RenderingServer.set_default_clear_color(Color("#c2e3e8"))
 
 	# 8. Tile detectie
 	for i in get_slide_collision_count():
