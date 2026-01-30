@@ -27,11 +27,12 @@ var first_idle = true
 @onready var popup = get_node("/root/Main/UI/WinPopup")
 @onready var teller_label = get_node("/root/Main/UI/TileCounterLabel")
 @onready var restart_button = get_node("/root/Main/UI/WinPopup/Button")
-@onready var next_level_button = get_node("/root/Main/UI/WinPopup/NextLevelButton")
+@onready var next_level_button = get_node("../UI/WinPopup/NextLevelButton")
 @onready var tilemap_layer = get_node("../TileMapLayer2")
 @onready var _animated_sprite = $AnimatedSprite2D
 @onready var idle_timer = $IdleTimer
 @onready var snow_step_player = $SnowStepPlayer
+@export var next_level_scene: PackedScene
 
 # SFX lijst
 var snow_step_sfx := [
@@ -285,12 +286,12 @@ func _on_finish_flag_body_entered(body: Node2D) -> void:
 func _on_restart_button_pressed():
 	get_tree().reload_current_scene()
 
+
 func _on_next_level_button_pressed():
-	var next_level = "res://main2.tscn"
-	if FileAccess.file_exists(next_level):
-		get_tree().change_scene_to_file(next_level)
+	if next_level_scene:
+		get_tree().change_scene_to_packed(next_level_scene)
 	else:
-		print("Fout: Level 2 niet gevonden!")
+		print("Fout: next_level_scene niet ingesteld!")
 	
 func _update_stopwatch_ui():
 	if stopwatch_label:

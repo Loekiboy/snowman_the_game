@@ -1,7 +1,8 @@
-[gd_scene load_steps=30 format=4 uid="uid://tkp6t1bqmr0h"]
+[gd_scene load_steps=31 format=4 uid="uid://tkp6t1bqmr0h"]
 
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="1_1bvp3"]
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_h2yge"]
+[ext_resource type="PackedScene" uid="uid://cjilns0sf5i26" path="res://main2.tscn" id="2_4c57u"]
 [ext_resource type="Texture2D" uid="uid://bbjpokngq5ys0" path="res://kenney_pixel-platformer/Tilemap/snowman.png" id="3_5vw27"]
 [ext_resource type="Texture2D" uid="uid://bwu41mrjphwwt" path="res://kenney_pixel-platformer/Tilemap/tilemap-backgrounds_packed.png" id="4_1bvp3"]
 [ext_resource type="Texture2D" uid="uid://c3t7xjlvp67pr" path="res://kenney_pixel-platformer/Tilemap/tilemap.png" id="4_7mycd"]
@@ -901,6 +902,7 @@ size = Vector2(18, 18)
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
 z_index = 6
 script = ExtResource("1_h2yge")
+next_level_scene = ExtResource("2_4c57u")
 
 [node name="Sprite2D" type="Sprite2D" parent="CharacterBody2D"]
 visible = false

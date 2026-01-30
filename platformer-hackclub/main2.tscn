@@ -1,4 +1,4 @@
-[gd_scene load_steps=41 format=4 uid="uid://cjilns0sf5i26"]
+[gd_scene load_steps=42 format=4 uid="uid://cjilns0sf5i26"]
 
 [ext_resource type="Script" uid="uid://ca6oomp66in6t" path="res://character_body_2d.gd" id="1_1mhn8"]
 [ext_resource type="Texture2D" uid="uid://dl0731a0a3qiw" path="res://kenney_pixel-platformer/Tiles/tile_0145.png" id="2_0rof8"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bwu41mrjphwwt" path="res://kenney_pixel-platformer/Tilemap/tilemap-backgrounds_packed.png" id="6_bbj40"]
 [ext_resource type="Texture2D" uid="uid://bk3yydt0lhmil" path="res://kenney_pixel-platformer/Tilemap/backgrounds_blue.png" id="7_4fcfw"]
 [ext_resource type="Texture2D" uid="uid://dtalbc8eg46wn" path="res://kenney_pixel-platformer/retry.png" id="7_l8hla"]
+[ext_resource type="Texture2D" uid="uid://01kf421sdi0w" path="res://kenney_pixel-platformer/next.png" id="8_hi5em"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_272bh"]
 radius = 8.0
@@ -1554,7 +1555,6 @@ tile_set = SubResource("TileSet_4c57u")
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="WinPopup" type="Panel" parent="UI"]
-visible = false
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -1613,6 +1613,23 @@ grow_vertical = 0
 theme_override_fonts/font = ExtResource("5_hi5em")
 theme_override_font_sizes/font_size = 38
 icon = ExtResource("7_l8hla")
+expand_icon = true
+
+[node name="NextLevelButton" type="Button" parent="UI/WinPopup"]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 38.0
+offset_top = -67.5
+offset_right = 87.0
+offset_bottom = -19.5
+grow_horizontal = 2
+grow_vertical = 0
+icon = ExtResource("8_hi5em")
 expand_icon = true
 
 [node name="TileCounterLabel" type="Label" parent="UI"]
