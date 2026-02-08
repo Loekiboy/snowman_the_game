@@ -2,10 +2,16 @@ extends CharacterBody2D
 
 # max tiles level 1: 605
 # --- INSTELLINGEN ---
-const SPEED = 70.0
+const BASE_SPEED = 70.0
+const MAX_SPEED = 100.0
 const JUMP_VELOCITY = -230.0
-const COYOTE_TIME = 0.16
 const CLIMB_SPEED = -70
+const COYOTE_TIME = 0.14
+
+# Momentum instellingen
+const ACCEL_TO_BASE = 800.0 
+const ACCEL_BOOST = 2.5     
+const AIR_FRICTION = 280.0
 
 # --- VARIABELEN ---
 var aangeraakte_tiles = []
@@ -58,7 +64,6 @@ func _ready():
 
 	_animated_sprite.play("idle")
 	_animated_sprite.frame = 0
-	# NIET hier starten, wachten tot speler stilstaat
 
 func _physics_process(delta: float) -> void:
 	if level_active:
@@ -70,7 +75,6 @@ func _physics_process(delta: float) -> void:
 	var parent = get_parent()
 	if parent: 
 		var tile_size = 18
-		# De offset: 14.5 tiles naar rechts (+), 17.4 naar beneden (+)
 		var ladder_offset = Vector2(14.5 * tile_size, 17.4 * tile_size)
 
 		for child in parent.get_children():
@@ -96,7 +100,7 @@ func _physics_process(delta: float) -> void:
 
 	if is_on_ladder and not just_jumped:
 		velocity.y = 0
-	else:   
+	else:    
 		if not is_on_floor():
 			velocity += get_gravity() * delta
 			coyote_timer -= delta
@@ -121,26 +125,40 @@ func _physics_process(delta: float) -> void:
 	if just_jumped and velocity.y > 0:
 		just_jumped = false
 
-	# 5. Beweging links/rechts
+	# 5. Beweging
 	var direction := Input.get_axis("ui_left", "ui_right")
+	
 	if direction:
-		velocity.x = direction * SPEED
+		# We willen versnellen
+		var current_speed = abs(velocity.x)
+		var accel = ACCEL_TO_BASE # Standaard snel optrekken
+		
+		# Als we al harder gaan dan de basis snelheid EN we gaan de goede kant op:
+		# Gebruik dan de langzame 'Boost' acceleratie.
+		if current_speed >= BASE_SPEED and sign(velocity.x) == direction:
+			accel = ACCEL_BOOST
+		
+		# Move toward zorgt dat we naar MAX_SPEED gaan, maar met de gekozen acceleratie
+		velocity.x = move_toward(velocity.x, direction * MAX_SPEED, accel * delta)
+		
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
+		# We stoppen
+		if is_on_floor():
+			velocity.x = 0 # Instant stil op de grond
+		else:
+			# In de lucht remmen we snel, maar niet instant
+			velocity.x = move_toward(velocity.x, 0, AIR_FRICTION * delta)
 
 	# 6. ANIMATIE LOGICA
 	if is_on_ladder and not is_on_floor():
 		_animated_sprite.play("climb")
-		# Pauzeer de animatie als de speler niet omhoog of omlaag beweegt
 		if velocity.y == 0:
 			_animated_sprite.stop() 
 		else:
 			_animated_sprite.play()
-
 		idle_timer.stop()
 		idle_in_transition = false
 		first_idle = true
-
 	elif not is_on_floor():
 		idle_timer.stop()
 		idle_in_transition = false
@@ -150,14 +168,18 @@ func _physics_process(delta: float) -> void:
 		else:
 			_animated_sprite.play("fall")
 	else:
-		if velocity.x != 0:
+		# Gebruik abs() > 0.1 omdat snelheid niet precies 0 hoeft te zijn
+		if abs(velocity.x) > 0.1: 
 			_animated_sprite.play("walk")
+			# Animatie snelheid aanpassen op hoe hard we rennen? (Optioneel)
+			# _animated_sprite.speed_scale = abs(velocity.x) / BASE_SPEED
+			
 			idle_timer.stop()
 			idle_in_transition = false
 			first_idle = true
 			if velocity.x < 0:
 				_animated_sprite.flip_h = false
-			else:   
+			else:    
 				_animated_sprite.flip_h = true
 		elif Input.is_action_pressed("ui_down"):
 			_animated_sprite.play("crouch")
@@ -165,18 +187,16 @@ func _physics_process(delta: float) -> void:
 			idle_in_transition = false
 			first_idle = true
 		else:
-			# Speler staat stil -> start idle animatie
 			if _animated_sprite.animation != "idle":
 				_animated_sprite.play("idle")
 				_animated_sprite.frame = 0
 				idle_in_transition = false
 				first_idle = true
-				idle_timer.start(3.0)  # EERSTE keer 3 seconden
+				idle_timer.start(3.0) 
 
 	# 7. Bewegen
 	move_and_slide()
 	
-	# Achtergrondkleur aanpassen op basis van hoogte (Y-positie)
 	if global_position.y < 0:
 		RenderingServer.set_default_clear_color(Color("#DFF6F5"))
 	else:
@@ -189,11 +209,9 @@ func _physics_process(delta: float) -> void:
 
 		if collider is TileMapLayer:
 			var normal = collision.get_normal()
-
 			if normal.y < -0.5:
 				var botspunt = collider.to_local(collision.get_position() - normal * 1)
 				var tile_coord = collider.local_to_map(botspunt)
-
 				if collider.get_cell_source_id(tile_coord) != -1:
 					if not tile_coord in aangeraakte_tiles: 
 						aangeraakte_tiles.append(tile_coord)
@@ -202,53 +220,40 @@ func _physics_process(delta: float) -> void:
 						var snow_layer = get_node("../SnowLayer")
 						if snow_layer: 
 							snow_layer.set_cell(tile_coord, 2, Vector2i(16, 7))
-
-						# plays rondom snow effect
 						if snow_step_player and snow_step_sfx.size() > 0:
 							snow_step_player.stream = snow_step_sfx[randi_range(0, snow_step_sfx.size() - 1)]
 							snow_step_player.play()
 
 func _on_idle_timer_timeout() -> void:
-	# Stop als speler beweegt
-	if velocity.x != 0:
+	if abs(velocity.x) > 0.1:
 		idle_in_transition = false
 		first_idle = true
 		return
-
 	var frame_nu = _animated_sprite.frame
-
-	# Als we in een transitie zitten, ga naar het doel frame
 	if idle_in_transition:
 		_animated_sprite.frame = idle_target_frame
 		idle_in_transition = false
 		idle_timer.start(randf_range(1.0, 3.0))
 		return
-
-	# EERSTE keer (3 sec omhoog gekeken) -> kies nu links of rechts
 	if first_idle: 
 		first_idle = false
-		var keuzes = [1, 2]  # Links of rechts
+		var keuzes = [1, 2] 
 		_animated_sprite.frame = keuzes.pick_random()
 		idle_timer.start(randf_range(1.0, 3.0))
 		return
-
-	# We kijken naar links (1) of rechts (2)
 	if frame_nu == 1 or frame_nu == 2:
 		var keuzes = [0, 1, 2]
-		keuzes.erase(frame_nu)  # Verwijder huidige frame uit keuzes
+		keuzes.erase(frame_nu)
 		var nieuw_frame = keuzes.pick_random()
-
-		# Als we van links naar rechts gaan (of andersom), eerst via midden
 		if (frame_nu == 1 and nieuw_frame == 2) or (frame_nu == 2 and nieuw_frame == 1):
 			_animated_sprite.frame = 0
 			idle_target_frame = nieuw_frame
 			idle_in_transition = true
-			idle_timer.start(0.2)  # Korte pauze in het midden
+			idle_timer.start(0.2)
 		else:
 			_animated_sprite.frame = nieuw_frame
 			idle_timer.start(randf_range(1.0, 3.0))
 	else:
-		# We kijken naar voren (frame 0) -> wacht nog niet, kies volgende
 		var keuzes = [1, 2]
 		_animated_sprite.frame = keuzes.pick_random()
 		idle_timer.start(randf_range(1.0, 3.0))
@@ -259,33 +264,24 @@ func update_ui():
 
 func _on_finish_flag_body_entered(body: Node2D) -> void:
 	if body.name == "CharacterBody2D":
-		level_active = false # Stop de timer
-		
+		level_active = false 
 		if teller_label: 
 			teller_label.visible = false
 		if stopwatch_label: 
 			stopwatch_label.visible = false
-		
 		if popup: 
 			var win_label = popup.get_node("TextEdit")
 			if win_label:
-				# 1. Bereken de multiplier en de eindscore
 				var multiplier = time_elapsed / 10.0
 				var totaal_score = count * multiplier
-				
-				# 2. Rond de getallen af
 				var afgeronde_mult = snapped(multiplier, 0.1)
 				var afgeronde_score = snapped(totaal_score, 1)
-				
-				# 3. Zet alles in de tekst
 				win_label.text = "Tiles: " + str(count) + " x " + str(afgeronde_mult) + \
 								 "\nScore: " + str(afgeronde_score)
-			
 			popup.visible = true
 
 func _on_restart_button_pressed():
 	get_tree().reload_current_scene()
-
 
 func _on_next_level_button_pressed():
 	if next_level_scene:
