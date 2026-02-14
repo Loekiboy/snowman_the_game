@@ -1082,5 +1082,15 @@ frame_progress = 0.5187803
 position = Vector2(3076, 333)
 shape = SubResource("RectangleShape2D_272bh")
 
+[node name="Label" type="Label" parent="."]
+offset_left = 222.0
+offset_top = 245.0
+offset_right = 348.0
+offset_bottom = 266.0
+theme_override_colors/font_color = Color(0.17254902, 0.77254903, 0.9647059, 1)
+theme_override_fonts/font = ExtResource("4_272bh")
+theme_override_font_sizes/font_size = 19
+text = "Get the lowest score!"
+
 [connection signal="timeout" from="CharacterBody2D/IdleTimer" to="CharacterBody2D" method="_on_idle_timer_timeout"]
 [connection signal="body_entered" from="FinishFlag" to="CharacterBody2D" method="_on_finish_flag_body_entered"]
